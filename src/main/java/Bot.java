@@ -79,26 +79,39 @@ public class Bot extends TelegramLongPollingBot {
                 String data=callbackQuery.getData();
                 User user=callbackQuery.getFrom();
                 Message message=callbackQuery.getMessage();
-                if(data.equals("22")){
+                if(data.equals("11"))   Sender(update,"Была нажата кнопка 1");
+                else if(data.equals("22")) Sender(update,"Была нажата кнопка 2");
+                else if(data.equals("33")) Sender(update,"Button 3 was pressed");
+                else if (data.equals("44")) Sender(update,"Button 4 was pressed");
 
-                    // sendMessage.setParseMode("Markdown");
-                    sendMessage.setText("Получилось");
-                    sendMessage.setChatId(message.getChatId().toString());
-                    try {
-                        execute(sendMessage);}
-                    catch (TelegramApiException e1){
-                        e1.printStackTrace();
-                    }
-                }
+
+
 
             }
 
         } catch (TelegramApiException e) {
             e.printStackTrace();
 
-
-
         }
+    }
+    public void Sender(Update update,String textMsg){
+        CallbackQuery callbackQuery=update.getCallbackQuery();
+        Message message=callbackQuery.getMessage();
+        SendMessage send=new SendMessage();
+        send.setChatId(message.getChatId().toString());
+
+        String data=callbackQuery.getData();
+
+
+
+        send.setText(textMsg);
+        try {
+            execute(send);
+        }
+        catch (TelegramApiException e){e.printStackTrace();}
+
+
+
     }
     public String parseMessage(String textMsg) {
         String response;
