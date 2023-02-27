@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 
@@ -45,7 +46,7 @@ public class Bot extends TelegramLongPollingBot {
                 //Достаем из inMess id чата пользователя
                 String chatId = inMess.getChatId().toString();
                 //Получаем текст сообщения пользователя, отправляем в написанный нами обработчик,который возвращает нам ответ в зависимости от сообщения пользователя
-                String response = parseMessage(inMess.getText());
+
                 //Создаем объект класса SendMessage - наш будущий ответ пользователю
                 SendMessage outMess = new SendMessage();
 /////////////////////////////// //СОЗДАЁМ inline-КЛАВИАТУРУ//////////////////////////////////////////////////
@@ -74,10 +75,9 @@ public class Bot extends TelegramLongPollingBot {
                 container.setKeyboard(MyKeyBoard);
 ///////////////////////////////////СОЗДАЛИ КЛАВИАТУРУ///////////////////////////////////////////////////////////////////////
                 //Добавляем в наше сообщение id чата а также наш ответ
-                outMess.setChatId(chatId);
-                outMess.setText(response);
-                outMess.setReplyMarkup(container);
-                execute(outMess);
+
+                parseMessage(update,container);
+                execute(parseMessage(update,container));
             }
             else if (update.hasCallbackQuery()){
 
@@ -85,22 +85,23 @@ public class Bot extends TelegramLongPollingBot {
                 String data=callbackQuery.getData();
 
 
-                if(data.equals("11"))   Sender(update,"Была нажата кнопка 1");
-                else if(data.equals("22")) Sender(update,"Была нажата кнопка 2");
-                else if(data.equals("33")) Sender(update,"Button 3 was pressed");
-                else if (data.equals("44")) Sender(update,"Button 4 was pressed");
+                if(data.equals("11"))   CallBackSender(update,"Была нажата кнопка 1");
+                else if(data.equals("22")) CallBackSender(update,"Была нажата кнопка 2");
+                else if(data.equals("33")) CallBackSender(update,"Была нажата кнопка 3");
+                else if (data.equals("44")) CallBackSender(update,"Была нажата кнопка 4");
 
 
 
 
             }
+            else  if (update.getMessage().getText().equals("товар 1")) ReplySender(update,ReplyMark.SubMenuOne());
 
         } catch (TelegramApiException e) {
             e.printStackTrace();
 
         }
     }
-    public void Sender(Update update,String textMsg){
+    public void CallBackSender(Update update,String textMsg){
         CallbackQuery callbackQuery=update.getCallbackQuery();
         Message message=callbackQuery.getMessage();
         SendMessage send=new SendMessage();
@@ -111,7 +112,7 @@ public class Bot extends TelegramLongPollingBot {
 
         send.setText(textMsg);
         try {
-            send.setReplyMarkup(ReplyMark.MyBoard());
+            send.setReplyMarkup(ReplyMark.MainBoard());
             execute(send);
         }
         catch (TelegramApiException e){e.printStackTrace();}
@@ -119,16 +120,43 @@ public class Bot extends TelegramLongPollingBot {
 
 
     }
-    public String parseMessage(String textMsg) {
-        String response;
-        //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
-        if(textMsg.equals("/start"))
-            response = "Привет,я знаю много цитат.Жми /get";
-        else if(textMsg.equals("/get"))
-            response = storage.getRandQuote();
+    public  void ReplySender(Update update,ReplyKeyboardMarkup rkm){
+        Message inmess=update.getMessage();
+        String chatID=inmess.getChatId().toString();
+        SendMessage send=new SendMessage();
+        send.setChatId(chatID);
+        send.setReplyMarkup(rkm);
+        try {execute(send);}
+        catch (TelegramApiException e){e.printStackTrace();}
 
+    }
+    public SendMessage parseMessage(Update update,InlineKeyboardMarkup inline) {
+
+        Message inmess=update.getMessage();
+        String textMsg=inmess.getText();
+        String chatid=inmess.getChatId().toString();
+        SendMessage send=new SendMessage();
+        send.setChatId(chatid);
+        //Сравниваем текст пользователя с нашими командами, на основе этого формируем ответ
+        if(textMsg.equals("/start")){
+            send.setReplyMarkup(inline);
+
+           send.setText("Привет,я знаю много цитат.Жми /get");
+        }
+
+        else if(textMsg.equals("/get")){
+           storage.getRandQuote();
+            send.setText( storage.getRandQuote());
+        }
+        else if(textMsg.equals("товар 1")){send.setReplyMarkup(ReplyMark.SubMenuOne());
+        send.setText("есть товар 1");
+        }
         else
-            response = "Сообщение не распознано";
-        return response;
+            send.setText("Сообщение не распознано");
+
+
+
+
+        return send;
     }
 }
