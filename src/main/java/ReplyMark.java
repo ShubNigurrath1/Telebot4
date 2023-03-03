@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReplyMark {//Этот класс создан ради его статическмх методов которые возвпащают Reply-клавиатуры,я беру их в нужный момент
+public class ReplyMark {//Этот класс создан ради его статических методов которые возвращают Reply-клавиатуры,я беру их в нужный момент
     public static ReplyKeyboardMarkup MainBoard() {
         ReplyKeyboardMarkup container = new ReplyKeyboardMarkup();
         KeyboardButton B1 = new KeyboardButton();

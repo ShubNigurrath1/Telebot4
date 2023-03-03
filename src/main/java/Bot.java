@@ -46,7 +46,7 @@ public class Bot extends TelegramLongPollingBot {
                 execute(parseMessage(update));//отправляем метод,в котором реализуется ветвление,то есть в зависимости от входящего сообщения меняется ответное
             } else if (update.hasCallbackQuery()) {
 
-               CallBackSender(update);
+               execute(CallBackSender(update));
 
             }
 
@@ -56,7 +56,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void CallBackSender(Update update) {//этот метод в зависимости от содержимого CallBackQuery отправляет нужное
+    public SendMessage CallBackSender(Update update) {//этот метод в зависимости от содержимого CallBackQuery отправляет нужное
         CallbackQuery callbackQuery = update.getCallbackQuery();//сообщение
         Message message = callbackQuery.getMessage();
         SendMessage send = new SendMessage();
@@ -64,20 +64,22 @@ public class Bot extends TelegramLongPollingBot {
 
         String calldata=callbackQuery.getData();
         String textMsg="";
-        try {
+
             if(calldata.equals("11")){
+            send.setReplyMarkup(null);
             send.setReplyMarkup(ReplyMark.MainBoard());//Цепляем нижнюю клавиатуру главное меню
             textMsg="Была нажата кнопка Вывести список товара";
+            send.setText(textMsg);
             }
             else if(calldata.equals("22")){
-                textMsg="Button 2 was pressed";}
+                send.setReplyMarkup(null);
+                textMsg="Button 2 was pressed";
 
                  send.setText(textMsg);
-                execute(send);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+            send.setReplyMarkup(InlineMark.GetDynamVitrina());}
 
+
+return send;
 
     }
 
